@@ -26,28 +26,41 @@ You can google your wireless device's brand to see if it supports monitor mode.<
 If a wireless device supports Monitor mode, it is highly likely that it also supports packet injection.
 
 ### Network and Wireless tools
-You should be able to run these two commands without errors:<br>
-```ifconfig```<br>
-```iwconfig```<br>
+You should be able to run these two commands without errors:
+```sh
+# List network interfaces
+ifconfig
 
-If you're unable to run these commands, you don't have these packages installed on your system.<br>
-Installation required tools:<br>
-- On Debian/Ubuntu/Kali
-```sudo apt install net-tools wireless-tools```
-- On Arch Linux
-```sudo pacman -S net-tools wireless-tools```
-- On Fedora
-```sudo dnf install net-tools wireless-tools```
+# List wireless interfaces
+iwconfig
+```
+
+If you're unable to run the commands above, install networking tools:
+```sh
+# On Debian/Ubuntu/Kali
+sudo apt install net-tools wireless-tools
+
+# On Arch Linux
+sudo pacman -S net-tools wireless-tools
+
+# On Fedora
+sudo dnf install net-tools wireless-tools
+```
 
 ### Python3 and Pandas
-Make sure you have python and it's pandas library installed on your system.<br>
-If you dont have them, install like this:<br>
-- On Debian/Ubuntu/Kali
-```sudo apt install python3 python3-pandas```
-- On Arch Linux
-```sudo pacman -S python python-pandas```
-- On Fedora
-```sudo dnf install python3 python3-pandas```
+Make sure you have python and it's pandas library installed on your system.
+
+If you don't have them, install like this:
+```sh
+# On Debian/Ubuntu/Kali
+sudo apt install python3 python3-pandas
+
+# On Arch Linux
+sudo pacman -S python python-pandas
+
+# On Fedora
+sudo dnf install python3 python3-pandas
+```
 
 ## Testing
 The testing is done in a Kali Linux virtual machine. It is ready out of the box to run this script, without needing any external tools installed.
