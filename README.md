@@ -9,7 +9,7 @@ It is capable of malicious activity and is intended solely for educational purpo
 I am not responsible for any actions taken with this script. Usage is at your own discretion and responsibility.<br>
 
 ## Project Summary
-Goal of this script is target management doing a deauthentication attack on a wireless network.
+Goal of this script is target management while doing a deauthentication attack on a wireless network.
 It should provide the functionality to target specific devices or exclude certain ones, as well as the option to target all devices on the same network.
 
 ## Prerequisites
