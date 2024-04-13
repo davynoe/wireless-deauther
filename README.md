@@ -43,7 +43,7 @@ If you dont have them, install like this:<br>
 ```sudo dnf install python3 python3-pandas```
 
 ## Testing
-The testing is done on a Kali Linux virtual machine.
+The testing is done on a Kali Linux virtual machine. It is ready out of the box to run this script, without needing any external tools installed.
 
 ## TODO
 - [x] Check if script is ran as root and with requested arguments
