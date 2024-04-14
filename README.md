@@ -72,7 +72,7 @@ The testing is done in a Kali Linux virtual machine. It is ready out of the box 
 - [x] Store the data to a CSV file to read it with pandas
 - [x] Print found networks to the user and ask the user to select a network
 - [x] Get the BSSID and Channel of the selected network to scan the network
-- [ ] Scan the selected network and it's channel with airodump-ng and store targets to a CSV file
+- [x] Scan the selected network and it's channel with airodump-ng and store targets to a CSV file
 - [ ] Print found targets and let user manage targets like: everyone except (x,y,z), only x, only (x,y,z), everyone, etc.
 - [ ] Deauthenticate targets until given time or keyboard interrupt
 - [ ] Set the wireless interface to it's default (Managed mode)
