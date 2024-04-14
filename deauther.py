@@ -39,9 +39,9 @@ def set_monitor():
         print("Unknown mode error:", mode)
         sys.exit(1)
 
-def scan_networks():
+def get_networks():
     try:
-        result = subprocess.run(["airodump-ng", sys.argv[1], "-w", "output", "--output-format", "csv"])
+        result = subprocess.run(["airodump-ng", "-w", "output", "--output-format", "csv", sys.argv[1]])
         if result.returncode != 0:
             print("Error:", result.stderr)
             sys.exit(1)
@@ -58,8 +58,8 @@ def scan_networks():
     df_wifi = pd.read_csv("output-01.csv", nrows=start_row_station, skipinitialspace=True)
     # df_station = pd.read_csv("output-01.csv", skiprows=start_row_station, skipinitialspace=True)
     os.remove("output-01.csv")
-    df_wifi_filtered = df_wifi.dropna(subset=["BSSID", "ESSID"])
-    return df_wifi_filtered
+    df_wifi = df_wifi.dropna(subset=["BSSID", "ESSID"])
+    return df_wifi
 
 def select_network(df):
     print(f'ID - {"BSSID".ljust(17)} - {"ESSID".ljust(20)}', end="\t\t")
@@ -83,12 +83,33 @@ def select_network(df):
     print("="*100)
     
     id = int(input("Select a network by ID:"))
-    target_bssid = df.iloc[id].BSSID
-    return target_bssid
+    target_bssid, target_channel = df.iloc[id][["BSSID", "channel"]].values
+    return (str(target_bssid), str(target_channel))
 
+def scan_network(bssid, channel):
+    try:
+        result = subprocess.run(["airodump-ng", "-c", channel, "--bssid", bssid, "-w", "output", "--output-format", "csv", sys.argv[1]])
+        if result.returncode != 0:
+            print("Error:", result.stderr)
+            sys.exit(1)
+    except KeyboardInterrupt:
+        os.system("clear")
+        print("Scan complete. Cleaning up.")
+
+    with open("output-01.csv", "r") as file:
+        for idx, line in enumerate(file):
+            if line.startswith("Station MAC"):
+                start_row_station = idx
+                break
+
+    df_station = pd.read_csv("output-01.csv", skiprows=start_row_station, skipinitialspace=True)
+    df_station = df_station["Station MAC"]
+    os.remove("output-01.csv")
+    return df_station
 if __name__ == "__main__":
     initial_check()
     set_monitor()
-    df_wifi = scan_networks()
-    target_bssid = select_network(df_wifi)
-    print(target_bssid)
+    df_wifi = get_networks()
+    bssid, channel = select_network(df_wifi)
+    df_station = scan_network(bssid, channel)
+    print(df_station.head())
