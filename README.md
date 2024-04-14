@@ -1,8 +1,6 @@
 # wireless-deauther
 A python script for wireless deauthentication attacks with target management.<br>
 
-Note: Script isn't ready for use yet, check **TODO** below for progress.
-
 ### Disclaimer
 This script is not intended for unauthorized use on public Wi-Fi networks. 
 It is capable of malicious activity and is intended solely for educational purposes or for use with explicit permission from network owners.<br>
@@ -48,7 +46,7 @@ sudo dnf install net-tools wireless-tools
 ```
 
 ### Python3 and Pandas
-Make sure you have python and it's pandas library installed on your system.
+Make sure you have python above version 3 and it's pandas library installed on your system.
 
 If you don't have them, install like this:
 ```sh
@@ -62,10 +60,31 @@ sudo pacman -S python python-pandas
 sudo dnf install python3 python3-pandas
 ```
 
+## Installation and Usage
+Make sure you meet the **Prerequisites** before installing.
+
+Clone the repo and cd into it.
+```sh
+git clone https://github.com/davynoe/wireless-deauther
+cd wireless-deauther
+```
+
+Mark the script as executable.
+```sh
+chmod +x deauther.py
+```
+
+Run the script as root and with your wireless interface as an argument.
+```sh
+# Example
+sudo ./deauther.py wlan0
+```
+
 ## Testing
 The testing is done in a Kali Linux virtual machine. It is ready out of the box to run this script, without needing any external tools installed.
 
 ## TODO
+### Main Procedure
 - [x] Check if script is ran as root and with requested arguments
 - [x] Set the wireless interface to monitor mode if it isn't in monitor mode
 - [x] Scan nearby networks with airodump-ng and wait for a keyboard interrupt (CTRL+C)
@@ -73,7 +92,13 @@ The testing is done in a Kali Linux virtual machine. It is ready out of the box 
 - [x] Print found networks to the user and ask the user to select a network
 - [x] Get the BSSID and Channel of the selected network to scan the network
 - [x] Scan the selected network and it's channel with airodump-ng and store targets to a CSV file
-- [x] Print found targets and let user manage targets like: everyone except (x,y,z), only x, only (x,y,z), everyone, etc.
-- [ ] Deauthenticate targets until given time or keyboard interrupt
-- [ ] Set the wireless interface to it's default (Managed mode)
-- [ ] Exit
+- [x] Print found targets and let user select targets 
+- [x] Deauthenticate targets with aireplay-ng until given time or keyboard interrupt
+- [x] Set the wireless interface to it's default mode if it was changed
+- [x] Exit
+
+### Issues to fix
+- [ ] Deauthentication is timeless, no option to add time
+- [ ] Bad presentation and handling of target results lower than 2.
+- [ ] No menu for reusability of the program
+- [ ] Lack of notification at times where keyboard interruption is needed 
