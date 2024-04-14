@@ -82,7 +82,7 @@ def select_network(df):
             print()
     print("="*100)
     
-    id = int(input("Select a network by ID:"))
+    id = int(input("Select a network by ID: "))
     target_bssid, target_channel = df.iloc[id][["BSSID", "channel"]].values
     return (str(target_bssid), str(target_channel))
 
@@ -106,10 +106,61 @@ def scan_network(bssid, channel):
     df_station = df_station["Station MAC"]
     os.remove("output-01.csv")
     return df_station
+
+def parse_input(input_str):
+    ids = []
+    ranges = input_str.split(',')
+    
+    for rng in ranges:
+        if '-' in rng:
+            start, end = map(int, rng.split('-'))
+            ids.extend(range(start, end + 1))
+        else:
+            ids.append(int(rng))
+    
+    return sorted(set(ids))
+
+def select_targets(df):
+    print(f'ID - {"Station MAC".ljust(17)}', end="\t\t")
+    print(f'ID - {"Station MAC".ljust(17)}')
+    print("="*55)
+    
+    half_len = len(df) // 2
+    for i in range(half_len + len(df) % 2):
+        mac1 = str(df.iloc[i])
+        
+        if i + half_len < len(df):
+            mac2 = str(df.iloc[i + half_len])
+        
+        print(f'{str(i).ljust(2)} - {mac1.ljust(17)}', end='')
+        if i + half_len < len(df):
+            print('\t\t', end='')
+            print(f'{str(i + half_len).ljust(2)} - {mac2.ljust(17)}')
+        else:
+            print()
+    print("="*55)
+
+    mode = None
+    while mode not in ("i", "e"):
+        mode = input("Select inclusion(everyone/only x,y,z) or exclusion(everyone except x,y,z) mode [i/e]:").lower()
+
+    if mode == "i":
+        selection_str = input("Include targets by IDs (1,2,3 or 1-3 or a for all): ")
+        if selection_str == "a": targets = df
+        else: 
+            ids = parse_input(selection_str)
+            targets = df.iloc[ids]
+    else:
+        selection_str = input("Exclude targets by IDs (1,2,3 or 1-3): ")
+        ids = parse_input(selection_str)
+        targets = df.drop(ids)
+    return targets.values
+    
 if __name__ == "__main__":
     initial_check()
     set_monitor()
     df_wifi = get_networks()
     bssid, channel = select_network(df_wifi)
     df_station = scan_network(bssid, channel)
-    print(df_station.head())
+    targets = select_targets(df_station)
+    print(f"Targets:\n{targets}")
