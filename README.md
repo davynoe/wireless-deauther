@@ -98,7 +98,8 @@ The testing is done in a Kali Linux virtual machine. It is ready out of the box 
 - [x] Exit
 
 ### Issues to fix
+- [x] Bad presentation and handling of target results lower than 2.
+- [x] Record repeating when giving scan results
 - [ ] Deauthentication is timeless, no option to add time
-- [ ] Bad presentation and handling of target results lower than 2.
 - [ ] No menu for reusability of the program
 - [ ] Lack of notification at times where keyboard interruption is needed 
