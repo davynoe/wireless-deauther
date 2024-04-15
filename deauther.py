@@ -65,25 +65,35 @@ def get_networks():
     return df_wifi
 
 def select_network(df):
-    print(f'ID - {"BSSID".ljust(17)} - {"ESSID".ljust(20)}', end="\t\t")
-    print(f'ID - {"BSSID".ljust(17)} - {"ESSID".ljust(20)}')
-    print("="*100)
-    
-    half_len = len(df) // 2
-    for i in range(half_len + len(df) % 2):
-        bssid1 = str(df.iloc[i]["BSSID"])
-        essid1 = str(df.iloc[i]["ESSID"])
-        
-        bssid2 = str(df.iloc[i + half_len]["BSSID"]) if i + half_len < len(df) else ""
-        essid2 = str(df.iloc[i + half_len]["ESSID"]) if i + half_len < len(df) else ""
-        
-        print(f'{str(i).ljust(2)} - {bssid1.ljust(17)} - {essid1.ljust(20)}', end='')
-        if i + half_len < len(df):
-            print('\t\t', end='')
-            print(f'{str(i + half_len).ljust(2)} - {bssid2.ljust(17)} - {essid2.ljust(20)}')
-        else:
-            print()
-    print("="*100)
+    if len(df) == 0:
+        print("No nearby networks are found, exiting...")
+        sys.exit(0)
+    elif len(df) == 1:
+        print(f'ID - {"BSSID".ljust(17)} - {"ESSID".ljust(20)}')
+        print("="*100)
+        bssid = str(df.iloc[0]["BSSID"])
+        essid = str(df.iloc[0]["ESSID"])
+        print(f'{"0".ljust(2)} - {bssid.ljust(17)} - {essid.ljust(20)}')
+        print("="*100)
+    else:
+        print(f'ID - {"BSSID".ljust(17)} - {"ESSID".ljust(20)}', end="\t\t")
+        print(f'ID - {"BSSID".ljust(17)} - {"ESSID".ljust(20)}')
+        print("="*100)
+        half_len = (len(df) + 1) // 2
+        for i in range(half_len):
+            bssid1 = str(df.iloc[i]["BSSID"])
+            essid1 = str(df.iloc[i]["ESSID"])
+            
+            bssid2 = str(df.iloc[i + half_len]["BSSID"]) if i + half_len < len(df) else ""
+            essid2 = str(df.iloc[i + half_len]["ESSID"]) if i + half_len < len(df) else ""
+            
+            print(f'{str(i).ljust(2)} - {bssid1.ljust(17)} - {essid1.ljust(20)}', end='')
+            if i + half_len < len(df):
+                print('\t\t', end='')
+                print(f'{str(i + half_len).ljust(2)} - {bssid2.ljust(17)} - {essid2.ljust(20)}')
+            else:
+                print()
+        print("="*100)
     
     id = int(input("Select a network by ID: "))
     target_bssid, target_channel = df.iloc[id][["BSSID", "channel"]].values
@@ -124,24 +134,34 @@ def parse_input(input_str):
     return sorted(set(ids))
 
 def select_targets(df):
-    print(f'ID - {"Station MAC".ljust(17)}', end="\t\t")
-    print(f'ID - {"Station MAC".ljust(17)}')
-    print("="*55)
-    
-    half_len = len(df) // 2
-    for i in range(half_len + len(df) % 2):
-        mac1 = str(df.iloc[i])
+    if len(df) == 0:
+        print("No targets found, exiting...")
+        sys.exit(0)
+    elif len(df) == 1:
+        print(f'ID - {"Station MAC".ljust(17)}')
+        print("="*55)
+        mac = str(df.iloc[0])
+        print(f'{"0".ljust(2)} - {mac.ljust(17)}')
+        print("="*55)
+    else:
+        print(f'ID - {"Station MAC".ljust(17)}', end="\t\t") 
+        print(f'ID - {"Station MAC".ljust(17)}')
+        print("="*55)
         
-        if i + half_len < len(df):
-            mac2 = str(df.iloc[i + half_len])
-        
-        print(f'{str(i).ljust(2)} - {mac1.ljust(17)}', end='')
-        if i + half_len < len(df):
-            print('\t\t', end='')
-            print(f'{str(i + half_len).ljust(2)} - {mac2.ljust(17)}')
-        else:
-            print()
-    print("="*55)
+        half_len = (len(df) + 1) // 2
+        for i in range(half_len):
+            mac1 = str(df.iloc[i])
+            
+            if i + half_len < len(df):
+                mac2 = str(df.iloc[i + half_len])
+            
+            print(f'{str(i).ljust(2)} - {mac1.ljust(17)}', end='')
+            if i + half_len < len(df):
+                print('\t\t', end='')
+                print(f'{str(i + half_len).ljust(2)} - {mac2.ljust(17)}')
+            else:
+                print()
+        print("="*55)
 
     mode = None
     while mode not in ("i", "e"):
